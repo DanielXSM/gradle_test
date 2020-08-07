@@ -1,0 +1,33 @@
+
+
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven{
+            url = version.endsWith('SNAPSHOT') ? project.ext.nexus_snapshots_url : project.ext.nexus_releases_url
+            credentials {
+                username project.ext.kunchi_nexus_username
+                password project.ext.kunchi_nexus_password
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

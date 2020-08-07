@@ -1,0 +1,147 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+}
+
+//全部项目通用
+allprojects{
+
+    tasks.withType(JavaCompile) {
+
+        options.encoding = "UTF-8"
+
+    }
+
+
+    repositories {
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenLocal() // 优先使用~/.m2/repository这个本地目录里有的jar包.
+        maven {
+            url "http://nexus2-dev-tech.ikunchi.com/nexus/content/groups/public"
+        }
+    }
+
+    //支持普通工程配置信息
+    ext {
+        nexus_snapshots_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/snapshots"
+        nexus_releases_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/releases"
+
+        kunchi_nexus_username = 'admin'
+        kunchi_nexus_password = 'admin123'
+    }
+
+    //支持符合子工程配置信息
+    subprojects {
+
+        ext {
+            nexus_snapshots_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/snapshots"
+            nexus_releases_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/releases"
+
+            kunchi_nexus_username = 'admin'
+            kunchi_nexus_password = 'admin123'
+        }
+    }
+}
+
+subprojects{
+    apply plugin:'java'
+    apply plugin:'idea'
+    apply plugin:'eclipse'
+    apply plugin:'jacoco'
+//    apply plugin:'org.springframework.boot'  api 不需要
+    apply plugin:'io.spring.dependency-management'
+
+
+    group = 'com.zdp.example'
+    version = '0.0.1-SNAPSHOT'
+
+    sourceCompatibility =1.8
+    targetCompatibility =1.8
+
+    // java编译的时候缺省状态下会因为中文字符而失败
+    [compileJava,compileTestJava,javadoc]*.options*.encoding ='UTF-8'
+
+    ext{
+        isbVersion = '1.0.79-SNAPSHOT'
+        nexus_snapshots_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/snapshots"
+        nexus_releases_url = "http://nexus2-dev-tech.ikunchi.com/nexus/content/repositories/releases"
+    }
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+
+    repositories {
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+        maven {
+            url "http://nexus2-dev-tech.ikunchi.com/nexus/content/groups/public"
+        }
+    }
+
+    dependencies {
+//        println("isb版本号============="+isbVersion)
+//        compile('com.kunchi.isb:isb-client-starter:'+isbVersion)
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+        compileOnly 'org.projectlombok:lombok:1.18.6'
+        annotationProcessor 'org.projectlombok:lombok:1.18.6'
+    }
+
+}
+/*
+project (':zdp-api'){
+
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
+    *//*dependencies {
+        compile('com.kunchi.isb:isb-client-starter:'+isbVersion)
+        compile('cn.afterturn:easypoi-spring-boot-starter:4.1.3')
+        compile('cn.afterturn:easypoi-annotation:4.1.3')
+        runtime('mysql:mysql-connector-java:5.1.46')
+    }*//*
+
+    test {
+        testLogging {
+            showStandardStreams = true
+        }
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+
+        repositories {
+            maven{
+                url = version.endsWith('SNAPSHOT') ? project.ext.nexus_snapshots_url : project.ext.nexus_releases_url
+                credentials {
+                    username project.ext.kunchi_nexus_username
+                    password project.ext.kunchi_nexus_password
+                }
+            }
+        }
+    }
+}*/
+
+
+/*
+project (':zdp-admin') {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
+
+    dependencies {
+        compile project(':zdp-api')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        testImplementation('org.springframework.boot:spring-boot-starter-test') {
+            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}*/

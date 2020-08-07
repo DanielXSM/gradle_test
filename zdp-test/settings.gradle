@@ -1,0 +1,2 @@
+rootProject.name = 'zdp-test'
+include('zdp-api','zdp-admin')
